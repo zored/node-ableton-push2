@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@types/mocha": "^8.2.2",
-    "@types/node": "^15.12.1",
+    "@types/node": "^20.3.1",
     "chai": "^4.3.4",
     "gulp": "^4.0.2",
     "gulp-typedoc": "^3.0.0",

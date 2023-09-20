@@ -9,18 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Push2 = exports.AFTERTOUCH_MODES = exports.PORTS = exports.MIDI_MODES = exports.SENSITIVITY = exports.Midi = void 0;
+exports.Push2 = exports.AFTERTOUCH_MODES = exports.PORTS = exports.ANIMATIONS = exports.MIDI_MODES = exports.SENSITIVITY = exports.Midi = void 0;
 const easymidi = require("easymidi");
+const assert = require("assert");
 const push2keymap = require('./Push2Keymap');
 const OS_PLATFORM = require('os').platform();
 const events_1 = require("events");
 const TouchStripConfiguration_1 = require("./TouchStripConfiguration");
 const DeviceIdentity_1 = require("./DeviceIdentity");
 const DeviceStatistics_1 = require("./DeviceStatistics");
-const assert = require("assert");
 /**
-* Access to MIDI events through [easymidi](https://github.com/dinchak/node-easymidi) interface.
-*/
+ * Access to MIDI events through [easymidi](https://github.com/dinchak/node-easymidi) interface.
+ */
 class Midi extends events_1.EventEmitter {
     constructor(portName = 'Ableton Push 2 User Port', virtual = false) {
         super();
@@ -48,9 +48,9 @@ class Midi extends events_1.EventEmitter {
         });
     }
     /**
-    * Send a midi message.
-    * See [midi documentation](doc/midi.md#midi-message-event-types) for message types.
-    */
+     * Send a midi message.
+     * See [midi documentation](doc/midi.md#midi-message-event-types) for message types.
+     */
     send(messageType, message) {
         this._output.send(messageType, message);
     }
@@ -59,8 +59,8 @@ class Midi extends events_1.EventEmitter {
         return this;
     }
     /**
-    * Remove event listeners and close ports.
-    */
+     * Remove event listeners and close ports.
+     */
     close() {
         this.removeAllListeners();
         this._input.close();
@@ -81,6 +81,25 @@ var MIDI_MODES;
     MIDI_MODES[MIDI_MODES["user"] = 1] = "user";
     MIDI_MODES[MIDI_MODES["both"] = 2] = "both";
 })(MIDI_MODES = exports.MIDI_MODES || (exports.MIDI_MODES = {}));
+var ANIMATIONS;
+(function (ANIMATIONS) {
+    ANIMATIONS[ANIMATIONS["stopTransition"] = 0] = "stopTransition";
+    ANIMATIONS[ANIMATIONS["oneShot24th"] = 1] = "oneShot24th";
+    ANIMATIONS[ANIMATIONS["oneShot16th"] = 2] = "oneShot16th";
+    ANIMATIONS[ANIMATIONS["oneShot8th"] = 3] = "oneShot8th";
+    ANIMATIONS[ANIMATIONS["oneShotQuarter"] = 4] = "oneShotQuarter";
+    ANIMATIONS[ANIMATIONS["oneShotHalf"] = 5] = "oneShotHalf";
+    ANIMATIONS[ANIMATIONS["pulsing24th"] = 6] = "pulsing24th";
+    ANIMATIONS[ANIMATIONS["pulsing16th"] = 7] = "pulsing16th";
+    ANIMATIONS[ANIMATIONS["pulsing8th"] = 8] = "pulsing8th";
+    ANIMATIONS[ANIMATIONS["pulsingQuarter"] = 9] = "pulsingQuarter";
+    ANIMATIONS[ANIMATIONS["pulsingHalf"] = 10] = "pulsingHalf";
+    ANIMATIONS[ANIMATIONS["blinking24th"] = 11] = "blinking24th";
+    ANIMATIONS[ANIMATIONS["blinking16th"] = 12] = "blinking16th";
+    ANIMATIONS[ANIMATIONS["blinking8th"] = 13] = "blinking8th";
+    ANIMATIONS[ANIMATIONS["blinkingQuarter"] = 14] = "blinkingQuarter";
+    ANIMATIONS[ANIMATIONS["blinkingHalf"] = 15] = "blinkingHalf";
+})(ANIMATIONS = exports.ANIMATIONS || (exports.ANIMATIONS = {}));
 // export  ports = new Enum({LIVE:0,USER:1}, {ignoreCase:true});
 var PORTS;
 (function (PORTS) {
@@ -94,22 +113,22 @@ var AFTERTOUCH_MODES;
     AFTERTOUCH_MODES[AFTERTOUCH_MODES["poly"] = 1] = "poly";
 })(AFTERTOUCH_MODES = exports.AFTERTOUCH_MODES || (exports.AFTERTOUCH_MODES = {}));
 /**
-* ## Push2 Controller Object
-* Opens a connection to a physical, connected Push 2 device, or alternatively a virtual port.
-* Implements the functions described in the [Ableton Push 2 MIDI And Display Interface Manual](
-*  https://github.com/Ableton/push-interface/blob/master/doc/AbletonPush2MIDIDisplayInterface.asc).
-* #### Quick start:
-* ```javascript
-* static ableton = require('ableton-push2');
-* let push2 = new ableton.Push2(port='user'); // Boom! A New Ableton Push 2!!
-* push2.setColor([2,3],30); 		 // Set track 2, scene 3 to color index 30
-* ```
-*/
+ * ## Push2 Controller Object
+ * Opens a connection to a physical, connected Push 2 device, or alternatively a virtual port.
+ * Implements the functions described in the [Ableton Push 2 MIDI And Display Interface Manual](
+ *  https://github.com/Ableton/push-interface/blob/master/doc/AbletonPush2MIDIDisplayInterface.asc).
+ * #### Quick start:
+ * ```javascript
+ * static ableton = require('ableton-push2');
+ * let push2 = new ableton.Push2(port='user'); // Boom! A New Ableton Push 2!!
+ * push2.setColor([2,3],30);         // Set track 2, scene 3 to color index 30
+ * ```
+ */
 class Push2 extends events_1.EventEmitter {
     /**
-    * @param port 'user' or 'live'
-    * @param virtual Opens a virtual software port
-    */
+     * @param port 'user' or 'live'
+     * @param virtual Opens a virtual software port
+     */
     constructor(port = 'user', virtual = false) {
         super();
         assert(!(virtual && OS_PLATFORM == 'win32'), "Virtual MIDI devices are not supported on Windows.");
@@ -136,7 +155,7 @@ class Push2 extends events_1.EventEmitter {
     close() {
         this.midi.close();
     }
-    setColor(key, paletteIdx) {
+    setColor(key, paletteIdx, animation = ANIMATIONS.stopTransition) {
         // key: key name from push2keymap
         // pad can also be an array containing [track,scene] with values [[1-8],[1-8]]
         // paletteIdx: color palette index [1-127]
@@ -156,16 +175,21 @@ class Push2 extends events_1.EventEmitter {
         if (keyIndex == null)
             throw `${keyName} not found.`;
         // console.log(`Setting color of ${keyName} (${keyIndex}) to ${paletteIdx}`);
+        let channel = animation;
+        if (typeof animation == 'string')
+            channel = ANIMATIONS[animation];
         if (keyName.slice(0, 4) == "pad ") { // Must be for a pad control, use noteon
             this.midi.send('noteon', {
                 note: keyIndex,
                 velocity: paletteIdx,
+                channel: channel,
             });
         }
         else { // Must be a button, use cc
             this.midi.send('cc', {
                 controller: keyIndex,
                 value: paletteIdx,
+                channel: channel,
             });
         }
     }
@@ -575,4 +599,3 @@ class Push2 extends events_1.EventEmitter {
 }
 exports.Push2 = Push2;
 module.exports = Push2;
-//# sourceMappingURL=Push2.js.map

@@ -7,21 +7,21 @@ export interface Midi {
     _output: any;
 }
 /**
-* Access to MIDI events through [easymidi](https://github.com/dinchak/node-easymidi) interface.
-*/
+ * Access to MIDI events through [easymidi](https://github.com/dinchak/node-easymidi) interface.
+ */
 export declare class Midi extends EventEmitter {
     constructor(portName?: string, virtual?: boolean);
     /**
-    * Send a midi message.
-    * See [midi documentation](doc/midi.md#midi-message-event-types) for message types.
-    */
+     * Send a midi message.
+     * See [midi documentation](doc/midi.md#midi-message-event-types) for message types.
+     */
     send(messageType: string, message: {
         [t: string]: number;
     } | number[]): void;
     removeAllListeners(event?: string | symbol): this;
     /**
-    * Remove event listeners and close ports.
-    */
+     * Remove event listeners and close ports.
+     */
     close(): void;
 }
 export interface Color {
@@ -89,6 +89,24 @@ export declare enum MIDI_MODES {
     user = 1,
     both = 2
 }
+export declare enum ANIMATIONS {
+    stopTransition = 0,
+    oneShot24th = 1,
+    oneShot16th = 2,
+    oneShot8th = 3,
+    oneShotQuarter = 4,
+    oneShotHalf = 5,
+    pulsing24th = 6,
+    pulsing16th = 7,
+    pulsing8th = 8,
+    pulsingQuarter = 9,
+    pulsingHalf = 10,
+    blinking24th = 11,
+    blinking16th = 12,
+    blinking8th = 13,
+    blinkingQuarter = 14,
+    blinkingHalf = 15
+}
 export declare enum PORTS {
     live = 0,
     user = 1
@@ -98,27 +116,27 @@ export declare enum AFTERTOUCH_MODES {
     poly = 1
 }
 /**
-* ## Push2 Controller Object
-* Opens a connection to a physical, connected Push 2 device, or alternatively a virtual port.
-* Implements the functions described in the [Ableton Push 2 MIDI And Display Interface Manual](
-*  https://github.com/Ableton/push-interface/blob/master/doc/AbletonPush2MIDIDisplayInterface.asc).
-* #### Quick start:
-* ```javascript
-* static ableton = require('ableton-push2');
-* let push2 = new ableton.Push2(port='user'); // Boom! A New Ableton Push 2!!
-* push2.setColor([2,3],30); 		 // Set track 2, scene 3 to color index 30
-* ```
-*/
+ * ## Push2 Controller Object
+ * Opens a connection to a physical, connected Push 2 device, or alternatively a virtual port.
+ * Implements the functions described in the [Ableton Push 2 MIDI And Display Interface Manual](
+ *  https://github.com/Ableton/push-interface/blob/master/doc/AbletonPush2MIDIDisplayInterface.asc).
+ * #### Quick start:
+ * ```javascript
+ * static ableton = require('ableton-push2');
+ * let push2 = new ableton.Push2(port='user'); // Boom! A New Ableton Push 2!!
+ * push2.setColor([2,3],30);         // Set track 2, scene 3 to color index 30
+ * ```
+ */
 export declare class Push2 extends EventEmitter {
     /**
-    * @param port 'user' or 'live'
-    * @param virtual Opens a virtual software port
-    */
+     * @param port 'user' or 'live'
+     * @param virtual Opens a virtual software port
+     */
     constructor(port?: string, virtual?: boolean);
     monitor(): void;
     stopMonitor(): void;
     close(): void;
-    setColor(key: any, paletteIdx: any): void;
+    setColor(key: any, paletteIdx: any, animation?: any): void;
     getDeviceId(): Promise<DeviceIdentity>;
     getTouchStripConfiguration(): Promise<TouchStripConfiguration>;
     setTouchStripConfiguration(val: any): Promise<TouchStripConfiguration>;
