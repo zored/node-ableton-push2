@@ -202,7 +202,7 @@ export class Push2 extends EventEmitter {
         this.portName = `${virtual ? 'Virtual ' : ''}Ableton Push 2`
         // this.portName = "Ableton Push 2";
         this.midi = new Midi(this.portName, virtual)
-        this.getDeviceId().then(id => console.log(id))
+        // this.getDeviceId().then(id => console.log(id))
         // this.getTouchStripConfiguration();
     }
 
